@@ -37,41 +37,44 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-            	    // ✅ ALLOW PREFLIGHT REQUESTS
-            	    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // ✅ CORS PREFLIGHT
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-            	    // 🔓 PUBLIC
-            	    .requestMatchers("/api/auth/**").permitAll()
-            	    .requestMatchers(HttpMethod.GET, "/api/items/**").permitAll()
+                // ✅ AUTH ENDPOINTS
+                .requestMatchers("/api/auth/**").permitAll()
 
-            	    // 👤 USER
-            	    .requestMatchers("/api/user/**").authenticated()
-            	    .requestMatchers("/api/reports/**").authenticated()
+                // ✅ PUBLIC ERROR ENDPOINT (IMPORTANT)
+                .requestMatchers("/error").permitAll()
 
-            	    // 👮 ADMIN
-            	    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // ✅ PUBLIC GET
+                .requestMatchers(HttpMethod.GET, "/api/items/**").permitAll()
 
-            	    .anyRequest().authenticated()
-            	)
+                // 🔐 PROTECTED
+                .requestMatchers("/api/user/**").authenticated()
+                .requestMatchers("/api/reports/**").authenticated()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                .anyRequest().authenticated()
+            )
 
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ CORS
+    // ✅ CORS CONFIG
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-            "http://localhost:5173",                  // local frontend
-            "https://reclaimit-frontend.onrender.com" // deployed frontend
+                "http://localhost:5173",
+                "https://reclaimit-frontend.onrender.com"
         ));
 
         config.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
 
         config.setAllowedHeaders(List.of("*"));
@@ -83,5 +86,4 @@ public class SecurityConfig {
 
         return source;
     }
-
 }
