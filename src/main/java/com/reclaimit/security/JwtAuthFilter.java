@@ -25,7 +25,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // ✅ 🔥 VERY IMPORTANT: SKIP AUTH ENDPOINTS
+        // ✅ SKIP CORS PREFLIGHT REQUESTS
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ SKIP AUTH ENDPOINTS
         if (request.getRequestURI().startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;

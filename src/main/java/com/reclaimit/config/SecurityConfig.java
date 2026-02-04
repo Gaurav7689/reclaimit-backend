@@ -37,20 +37,22 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 PUBLIC
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/items/**").permitAll()
+            	    // ✅ ALLOW PREFLIGHT REQUESTS
+            	    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // 👤 USER (JWT REQUIRED)
-                .requestMatchers("/api/user/**").authenticated()
-                .requestMatchers("/api/reports/**").authenticated()
+            	    // 🔓 PUBLIC
+            	    .requestMatchers("/api/auth/**").permitAll()
+            	    .requestMatchers(HttpMethod.GET, "/api/items/**").permitAll()
 
-                // 👮 ADMIN ONLY
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            	    // 👤 USER
+            	    .requestMatchers("/api/user/**").authenticated()
+            	    .requestMatchers("/api/reports/**").authenticated()
 
-                // ❗ FALLBACK
-                .anyRequest().authenticated()
-            )
+            	    // 👮 ADMIN
+            	    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+            	    .anyRequest().authenticated()
+            	)
 
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
